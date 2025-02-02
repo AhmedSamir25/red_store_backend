@@ -32,15 +32,20 @@ class AuthController extends Controller
     }
 
     public function login(Request $request)
-    {
-        $credentials = $request->only('email', 'password');
+{
+    $credentials = $request->only('email', 'password');
 
-        if (!$token = Auth::attempt($credentials)) {
-            return response()->json(['error' => 'Unauthorized'], 401);
-        }
-
-        return $this->respondWithToken($token);
+    if (!$token = JWTAuth::attempt($credentials)) {
+        return response()->json(['error' => 'Unauthorized'], 401);
     }
+    return response()->json([
+        'token' => $token,
+        'token_type' => 'bearer',
+        'expires_in' => config('jwt.ttl') * 60,
+    ]);
+}
+
+    
 
     public function logout()
     {
